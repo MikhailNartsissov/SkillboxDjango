@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Product(models.Model):
@@ -13,3 +14,14 @@ class Product(models.Model):
     price = models.DecimalField(default=0, max_digits=8, decimal_places=2, help_text="Цена за единицу товара")
     discount = models.SmallIntegerField(default=0, help_text="Размер скидки в процентах")
     created_at = models.DateTimeField(auto_now_add=True, help_text="Дата и время внесения товара в каталог")
+
+
+class Order(models.Model):
+    """
+    Class for orders description
+    """
+    delivery_address = models.TextField(null=False, blank=True, help_text="Адрес доставки заказа")
+    promo_code = models.CharField(max_length=20, null=False, blank=True, help_text="Промокод, примененный в заказе")
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Дата и время создания заказа")
+    user = models.ForeignKey(User, on_delete=models.PROTECT, help_text="Сведения о пользователе, сделавшем заказ")
+    products = models.ManyToManyField(Product, related_name="orders", help_text="Список заказанных товаров")

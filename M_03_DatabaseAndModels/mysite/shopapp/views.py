@@ -1,10 +1,15 @@
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render
 from timeit import default_timer
-from .models import Product
+from .models import Product, Order
 
 
 def shop_index(request: HttpRequest) -> HttpResponse:
+    """
+    Render for index page
+    :param request: HttpRequest
+    :return: render
+    """
     products = [
         ("Приворотное зелье", 1999,
          "https://i.pinimg.com/236x/32/72/39/3272398743d01e8b426dc469210cc177.jpg", True, None),
@@ -29,7 +34,24 @@ def shop_index(request: HttpRequest) -> HttpResponse:
 
 
 def products_list(request: HttpRequest) -> HttpResponse:
+    """
+    Render for products page
+    :param request: HttpRequest
+    :return: render
+    """
     context = {
         "products": Product.objects.all(),
     }
     return render(request, "shopapp/products-list.html", context=context)
+
+
+def orders_list(request: HttpRequest) -> HttpResponse:
+    """
+    Render for orders page
+    :param request: HttpRequest
+    :return: render
+    """
+    context = {
+        "orders": Order.objects.select_related("user").prefetch_related("products").all(),
+    }
+    return render(request, "shopapp/orders-list.html", context=context)
