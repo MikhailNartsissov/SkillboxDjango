@@ -1,0 +1,50 @@
+{% extends 'shopapp/base.html' %}
+
+{% block title %}
+    Shop Index
+{% endblock %}
+
+{% block body %}
+    <h1>
+        Добро пожаловать в наш магазинчик!
+    </h1>
+    <h2>
+        Сегодня и ежедневно! Только для вас с хорошей скидкой!
+    </h2>
+    <div>
+        <ul>
+            {% for name, price, url, luck, curse in products %}
+                <dl>
+                  <dt>{{ properties|random }} товар:</dt>
+                    <dd>{{ name|upper }}</dd>
+                    <dd><img src={{ url }}></dd>
+                  <dt>Свойства:</dt>
+                    <dd>Магическая сила: {{ name|length }}</dd>
+                    <dd>Приносит ли удачу в бизнесе: {{ luck|yesno:"Несомненно!,Никогда!,Возможно!" }} </dd>
+                    <dd>Снимает ли порчу и сглаз: {{ curse|yesno:"Несомненно!,Никогда!,Возможно!" }} </dd>
+                  <dt>Цена:</dt>
+                    <dd>Всего-навсего {{ price }} монет! <i>{{ price_adv|random }}</i></dd>
+                </dl>
+            <br>
+                {% empty %}
+                No products here
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h3 style="color: red">
+            Цены на указанные выше товары изменятся через: {{ time_running }} лет
+        </h3>
+    </div>
+    <div>
+    </div>
+    <div>
+        <h2>
+            Внимание! Попытайте счастья!
+        </h2>
+        <h3>
+            Расшифровавшему заклинание, текст которого приведён ниже, скидка десять монет на любой товар!
+        </h3>
+        {% lorem 3 p random %}
+    </div>
+{% endblock %}
