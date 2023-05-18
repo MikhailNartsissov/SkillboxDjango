@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render
 from timeit import default_timer
+from .models import Product
 
 
 def shop_index(request: HttpRequest) -> HttpResponse:
@@ -25,3 +26,10 @@ def shop_index(request: HttpRequest) -> HttpResponse:
         "time_running": default_timer(),
     }
     return render(request, "shopapp/shop-index.html", context=context)
+
+
+def products_list(request: HttpRequest) -> HttpResponse:
+    context = {
+        "products": Product.objects.all(),
+    }
+    return render(request, "shopapp/products-list.html", context=context)
