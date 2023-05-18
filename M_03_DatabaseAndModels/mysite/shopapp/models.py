@@ -6,6 +6,8 @@ class Product(models.Model):
     """
     Class for products description
     """
+    class Meta:
+        ordering = ["name"]
     name = models.CharField(null=False, blank=False, max_length=35, help_text="Наименование товара")
     description = models.TextField(null=False, blank=True, help_text="Описание товара")
     picture_url = models.URLField(default='https://cs6.pikabu.ru/avatars/547/v547695-2072060446.jpg', null=False)
