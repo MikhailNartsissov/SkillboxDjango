@@ -1,0 +1,37 @@
+{% extends 'shopapp/base.html' %}}
+
+
+{% block title %}
+    Заказы наших любимых покупателей
+{% endblock %}
+
+{% block body %}
+<h1 xmlns="http://www.w3.org/1999/html">Заказы наших любимых покупателей:</h1>
+{% if orders %}
+    <div>
+        {% for order in orders %}
+            <div>
+                <p><b>Номер заказа:</b> {{ order.id }}</p>
+                <p><b>Дата и время заказа:</b> {{ order.created_at }}</p>
+                <p><b>Любимый покупатель:</b> {% firstof order.user.first_name order.user.username %}</p>
+                <p><b>Адрес доставки:</b> {{ order.delivery_address }}</p>
+                <p><b>Применен промокод:</b> <code>{{ order.promo_code }}</code></p>
+                <div>
+                    <b>Заказанные товары:</b>
+                </div>
+                <ul>
+                    {% for product in order.products.all %}
+                        <li>{{ product.name }} по цене {{ product.price }} монет за единицу товара</li>
+                    {% endfor %}
+                </ul>
+                <br><br>
+            </div>
+        {% endfor %}
+    </div>
+
+{% else %}
+    <h3>Пока не сделано ни одного заказа. Спешите! Зелье само себя не выпьет!</h3>
+{% endif %}
+
+
+{% endblock %}
