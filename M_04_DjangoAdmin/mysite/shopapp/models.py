@@ -16,6 +16,7 @@ class Product(models.Model):
     price = models.DecimalField(default=0, max_digits=8, decimal_places=2, help_text="Цена за единицу товара")
     discount = models.SmallIntegerField(default=0, help_text="Размер скидки в процентах")
     created_at = models.DateTimeField(auto_now_add=True, help_text="Дата и время внесения товара в каталог")
+    archived = models.BooleanField(default=False, null=False, help_text="Архивная запись или нет")
 
     def __str__(self) -> str:
         """

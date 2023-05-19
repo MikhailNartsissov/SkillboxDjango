@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Product, Order
-from django.db.models import TextField
+from django.db.models import TextField, QuerySet
 from django.http import HttpRequest
 
 
@@ -18,18 +18,62 @@ class OrderInline(admin.TabularInline):
     model = Product.orders.through
 
 
+@admin.action(description="Mark selected as Archived")
+def mark_archived(model_admin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
+    """
+    Marks selected records as archived
+    :param model_admin:
+    :param request:
+    :param queryset:
+    :return: None
+    """
+    queryset.update(archived=True)
+
+
+@admin.action(description="Mark selected as Unarchived")
+def mark_unarchived(model_admin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
+    """
+    Marks selected records as unarchived
+    :param model_admin:
+    :param request:
+    :param queryset:
+    :return: None
+    """
+    queryset.update(archived=False)
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     """
     Class for Product objects presentation in admin vew
     """
+    actions = [
+        mark_archived,
+        mark_unarchived,
+    ]
     inlines = [
         OrderInline,
     ]
-    list_display = "pk", "name", "description_short", "price", "discount"
+    list_display = "pk", "name", "description_short", "price", "discount", "archived"
     list_display_links = "pk", "name"
     ordering = "price", "name"
     search_fields = "name", "description", "price"
+    fieldsets = [
+        (None, {
+            "fields": ("name", "description"),
+        }),
+        ("Ценовые параметры (цена за единицу, скидка и т.п.)", {
+            "fields": ("price", "discount"),
+            "classes": ("collapse", 'wide'),
+        }),
+        ("Дополнительные возможности (архивация и т.п.)", {
+            "fields": ("archived",),
+            "classes": ("collapse",),
+            "description": "Данный раздел является дополнительным. Атрибут 'Archived' можно использовать для "
+                           "'мягкого удаления' записи (То есть, при необходимости, удалённую таким образом запись "
+                           "можно легко восстановить)."
+        }),
+    ]
 
     @classmethod
     def description_short(cls, obj: Product) -> TextField:
