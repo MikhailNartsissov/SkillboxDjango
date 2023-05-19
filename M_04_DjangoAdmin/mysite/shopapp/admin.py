@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Product, Order
 from django.db.models import TextField, QuerySet
 from django.http import HttpRequest
+from .admin_mixins import ExportAsCSVMixin
 
 
 class ProductInline(admin.TabularInline):
@@ -43,13 +44,14 @@ def mark_unarchived(model_admin: admin.ModelAdmin, request: HttpRequest, queryse
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin, ExportAsCSVMixin):
     """
     Class for Product objects presentation in admin vew
     """
     actions = [
         mark_archived,
         mark_unarchived,
+        "export_csv",
     ]
     inlines = [
         OrderInline,
