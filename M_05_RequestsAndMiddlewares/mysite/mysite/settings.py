@@ -49,6 +49,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'uploadfileapp.middlewares.SuspiciousRequestsMiddleware',
+
+
 ]
 
 ROOT_URLCONF = 'mysite.urls'
