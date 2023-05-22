@@ -1,0 +1,15 @@
+{% extends 'uploadfileapp/base.html' %}
+
+{% block title %}
+  Ошибка при загрузке - файл слишком велик
+{% endblock %}
+
+{% block body %}
+  <h1>При загрузке файла возникла ошибка:</h1>
+    <h2>К сожалению файл слишком велик для загрузки.</h2>
+    <h2>Попробуйте выбрать другой файл.</h2>
+    <p>
+      <input type="button" onclick="history.back();" value="Назад">
+    </p>
+
+{% endblock %}

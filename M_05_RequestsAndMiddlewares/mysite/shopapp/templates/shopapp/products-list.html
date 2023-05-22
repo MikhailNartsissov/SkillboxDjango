@@ -1,0 +1,36 @@
+{% extends 'shopapp/base.html' %}}
+
+
+{% block title %}
+    Товары в продаже
+{% endblock %}
+
+{% block body %}
+<h1>Сегодня у нас в продаже</h1>
+{% if products %}
+    <div>
+        {% for product in products %}
+            <div><img src={{ product.picture_url }}></div>
+            <div>
+                <p><b>Наименование товара:</b> {{ product.name }}</p>
+                {% if product.description|length > 0 %}
+                <p><b>Описание товара:</b> {{ product.description }}</p>
+                {% else %}
+                    <p><b>Описание товара:</b> {% lorem 1p random %}</p>
+                {% endif %}
+                <p><b>Приносит ли товар удачу в бизнесе:</b> {{ product.luck_in_business|yesno:"Несомненно!,Иногда" }}</p>
+                <p><b>Снимает ли товар порчу и сглаз:</b> {{ product.curse_removes|yesno:"Несомненно!,Иногда" }}</p>
+                <p><b>Размер скидки в процентах:</b> {% firstof product.discount "Этот товар мы и так отдаём почти даром!" %}</p>
+                <p><b>Цена за единицу товара:</b> {{ product.price }} монет </p>
+                <br><br>
+            </div>
+        {% endfor %}
+    </div>
+
+{% else %}
+    <h3>К сожалению всё уже раскупили, но мы спешим поставить новые товары.
+        Загляните к нам через пару дней, будет что-нибудь ещё лучше, чем было!</h3>
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'uploadfileapp/base.html' %}
+
+{% block title %}
+  Загрузка файла
+{% endblock %}
+
+{% block body %}
+  <h1>Выберите файл для загрузки:</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>
+      <input type="file" name="file_to_upload">
+    </p>
+    <button type="submit">Загрузить</button>
+  </form>
+{% endblock %}
