@@ -1,0 +1,24 @@
+{% extends 'shopapp/base.html' %}
+
+{% block title %}
+  New product adding
+{% endblock %}
+
+{% block body %}
+<h1>Add a new product to a database</h1>
+<div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">
+            Add product to database
+        </button>
+    </form>
+</div>
+<br>
+<div>
+  <a href="{% url 'shopapp:products_list' %}">
+    Go to products list
+  </a>
+</div>
+{% endblock %}
