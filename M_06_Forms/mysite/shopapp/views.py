@@ -7,6 +7,8 @@ from django.shortcuts import render, redirect, reverse
 from .models import Product, Order
 from .forms import ProductForm, OrderForm
 
+from django.contrib import messages
+
 
 def shop_index(request: HttpRequest):
     products = [
@@ -39,9 +41,12 @@ def create_product(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = ProductForm(request.POST)
         if form.is_valid():
-            form.save()
-            url = reverse("shopapp:products_list")
-            return redirect(url)
+            if not form.cleaned_data["name"][0].isdigit():
+                form.save()
+                url = reverse("shopapp:products_list")
+                return redirect(url)
+            else:
+                messages.error(request, "Please ensure that product name doesn't start with digit.")
     form = ProductForm()
     context = {
         "form": form,

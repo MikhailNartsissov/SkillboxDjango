@@ -9,6 +9,13 @@
 <div>
     <form method="post">
         {% csrf_token %}
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li><h3>{{ message }}</h3></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         {{ form.as_p }}
         <button type="submit">
             Add product to database
