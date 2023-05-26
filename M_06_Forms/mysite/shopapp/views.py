@@ -41,12 +41,12 @@ def create_product(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = ProductForm(request.POST)
         if form.is_valid():
-            if not form.cleaned_data["name"][0].isdigit():
+            if form.cleaned_data["name"][0].isalpha():
                 form.save()
                 url = reverse("shopapp:products_list")
                 return redirect(url)
             else:
-                messages.error(request, "Please ensure that product name doesn't start with digit.")
+                messages.error(request, "Please ensure that product name starts with letter.")
     form = ProductForm()
     context = {
         "form": form,
