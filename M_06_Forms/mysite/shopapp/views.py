@@ -9,6 +9,8 @@ from .forms import ProductForm, OrderForm
 
 from django.contrib import messages
 
+from django.contrib.auth.models import User
+
 
 def shop_index(request: HttpRequest):
     products = [

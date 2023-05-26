@@ -10,6 +10,7 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        <input type="hidden" name="user" value=1>
         <button type="submit">
             Add an order to a database
         </button>
