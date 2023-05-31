@@ -10,11 +10,38 @@
   <h1>Product <strong>{{ product.name }}</strong></h1>
     <div>
       <div>Name: {{ product.name }}</div>
-      <div>Description<em>{{ product.description|linebreaks }}</em></div>
+      <div>Description: <em>{{ product.description }}</em></div>
       <div>Price: {{ product.price }}</div>
       <div>Discount: {% firstof product.discount 'no discount' %}</div>
       <div>Archived: {{ product.archived }}</div>
+      {% with reviews.count as total_reviews %}
+      <h2>
+         {{ total_reviews }} review{{ total_reviews|pluralize }} of the product:
+      </h2>
+      {% endwith %}
+      {% for review in reviews %}
+      <div class="comment">
+          <p class="info">
+              <em>
+                  Review {{ forloop.counter }} by {{ review.author }}
+                  {{ review.publication_date }}:
+              </em>
+          </p>
+          <strong>{{ review.content|linebreaks }}</strong>
+      </div>
+    {% empty %}
+        <p>There are no reviews yet.</p>
+    {% endfor %}
     </div>
+  <br>
+  {% if new_review %}
+      <h2>Your review has been added.</h2>
+  {% else %}
+      <h2>Add a review</h2>
+      <form action="{% url 'shopapp:add_review' pk=product.pk %}">
+          <p><input type="submit" value="Add review"></p>
+      </form>
+  {% endif %}
   <br>
   <div>
     <a href="{% url 'shopapp:product_update' pk=product.pk %}">

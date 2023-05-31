@@ -9,7 +9,7 @@ from django.views import View
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from .models import Product, Order
+from .models import Product, Order, Reviews
 from .forms import GroupForm
 
 
@@ -53,6 +53,11 @@ class ProductDetailsView(DetailView):
     model = Product
     context_object_name = 'product'
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(ProductDetailsView, self).get_context_data(*args, **kwargs)
+        context['reviews'] = Reviews.objects.filter(product=self.object.pk)
+        return context
+
 
 class ProductCreateView(CreateView):
     model = Product
@@ -70,6 +75,22 @@ class ProductUpdateView(UpdateView):
             'shopapp:product_details',
             kwargs={"pk": self.object.pk},
         )
+
+
+class ReviewsCreateView(CreateView):
+    model = Reviews
+    fields = "content",
+
+    def get_success_url(self):
+        return reverse(
+            'shopapp:product_details',
+            kwargs={"pk": self.object.product.pk},
+        )
+
+    def form_valid(self, form):
+        form.instance.product = Product.objects.get(id=self.kwargs['pk'])
+        form.instance.author = self.request.user.username
+        return super().form_valid(form)
 
 
 class ProductDeleteView(DeleteView):

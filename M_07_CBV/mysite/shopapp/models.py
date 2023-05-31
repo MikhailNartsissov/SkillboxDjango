@@ -23,3 +23,10 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     products = models.ManyToManyField(Product, related_name="orders")
+
+
+class Reviews(models.Model):
+    author = models.CharField(max_length=50, null=False, blank=True, default='Anonymous user')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    content = models.TextField(max_length=300)
+    publication_date = models.DateField(auto_now=True)
