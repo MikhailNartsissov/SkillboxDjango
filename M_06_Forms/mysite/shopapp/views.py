@@ -11,6 +11,8 @@ from django.contrib import messages
 
 from django.contrib.auth.models import User
 
+from django.core.exceptions import ValidationError
+
 
 def shop_index(request: HttpRequest):
     products = [
@@ -43,12 +45,11 @@ def create_product(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = ProductForm(request.POST)
         if form.is_valid():
-            if form.cleaned_data["name"][0].isalpha():
-                form.save()
-                url = reverse("shopapp:products_list")
-                return redirect(url)
-            else:
-                messages.error(request, "Please ensure that product name starts with letter.")
+            form.save()
+            url = reverse("shopapp:products_list")
+            return redirect(url)
+        elif form.errors['name']:
+            messages.error(request, form.errors['name'])
     form = ProductForm()
     context = {
         "form": form,
@@ -65,10 +66,16 @@ def orders_list(request: HttpRequest):
 
 def create_order(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
+        if request.user.username:
+            form = OrderForm(request.POST)
+            new_form = form.save(commit=False)
+            new_form.user = request.user
+            new_form.save()
             url = reverse("shopapp:orders_list")
+            return redirect(url)
+        else:
+            messages.error(request, "You must be authenticated to create orders")
+            url = "/admin/"
             return redirect(url)
     form = OrderForm()
     context = {
