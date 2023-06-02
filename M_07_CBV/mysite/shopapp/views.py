@@ -2,15 +2,17 @@ from timeit import default_timer
 
 from django.contrib.auth.models import Group
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.urls import reverse_lazy
 
 from django.views import View
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from .models import Product, Order, Reviews
-from .forms import GroupForm
+from .models import Product, Order
+from .forms import GroupForm, ReviewForm
+
+from django.contrib import messages
 
 
 class ShopIndexView(View):
@@ -55,8 +57,20 @@ class ProductDetailsView(DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProductDetailsView, self).get_context_data(*args, **kwargs)
-        context['reviews'] = Reviews.objects.filter(product=self.object.pk)
+        context['reviews'] = self.object.reviews_set.all()
+        context['review_form'] = ReviewForm()
         return context
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        product = get_object_or_404(self.model, pk=pk)
+        review_form = ReviewForm(data=request.POST)
+        if review_form.is_valid():
+            new_review = review_form.save(commit=False)
+            new_review.product = product
+            new_review.author = request.user
+            new_review.save()
+            messages.info(request, "Your review has been added.", extra_tags="review_added")
+        return redirect(request.path)
 
 
 class ProductCreateView(CreateView):
@@ -75,22 +89,6 @@ class ProductUpdateView(UpdateView):
             'shopapp:product_details',
             kwargs={"pk": self.object.pk},
         )
-
-
-class ReviewsCreateView(CreateView):
-    model = Reviews
-    fields = "content",
-
-    def get_success_url(self):
-        return reverse(
-            'shopapp:product_details',
-            kwargs={"pk": self.object.product.pk},
-        )
-
-    def form_valid(self, form):
-        form.instance.product = Product.objects.get(id=self.kwargs['pk'])
-        form.instance.author = self.request.user.username
-        return super().form_valid(form)
 
 
 class ProductDeleteView(DeleteView):
