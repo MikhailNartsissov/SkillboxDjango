@@ -14,11 +14,13 @@
       <div>Price: {{ product.price }}</div>
       <div>Discount: {% firstof product.discount 'no discount' %}</div>
       <div>Archived: {{ product.archived }}</div>
+
       {% with reviews.count as total_reviews %}
       <h2>
          {{ total_reviews }} review{{ total_reviews|pluralize }} of the product:
       </h2>
       {% endwith %}
+
       {% for review in reviews %}
       <div class="comment">
           <p class="info">
@@ -33,22 +35,33 @@
         <p>There are no reviews yet.</p>
     {% endfor %}
     </div>
+
+    {% if messages %}
+        {% for message in messages %}
+           {% if message.extra_tags == "review_added" %}
+               <h2>{{ message }}</h2>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
   <br>
-  {% if new_review %}
-      <h2>Your review has been added.</h2>
-  {% else %}
-      <h2>Add a review</h2>
-      <form action="{% url 'shopapp:add_review' pk=product.pk %}">
-          <p><input type="submit" value="Add review"></p>
+    <h2>Add a review</h2>
+      <form action="." method="post">
+          <p>
+              {% csrf_token %}
+              {{ review_form.as_p }}
+              <input type="submit" value="Add review">
+          </p>
       </form>
-  {% endif %}
   <br>
+
   <div>
-    <a href="{% url 'shopapp:product_update' pk=product.pk %}">
+    <a href="{% url 'shopapp:product_details' pk=product.pk %}">
       Update product details
     </a>
   </div>
   <br>
+
   <div>
     <a href="{% url 'shopapp:product_archive' pk=product.pk %}">
       Archive product
