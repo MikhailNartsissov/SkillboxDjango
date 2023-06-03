@@ -3,6 +3,8 @@ from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 
 from .models import Product, Order
 
@@ -26,13 +28,20 @@ class ProductsListView(ListView):
     queryset = Product.objects.filter(archived=False)
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = "shopapp.add_product"
     model = Product
     fields = "name", "price", "description", "discount"
     success_url = reverse_lazy("shopapp:products_list")
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        super().form_valid(form)
+        return HttpResponseRedirect(self.success_url)
 
-class ProductUpdateView(UpdateView):
+
+class ProductUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'shopapp.change_product'
     model = Product
     fields = "name", "price", "description", "discount"
     template_name_suffix = "_update_form"
@@ -42,6 +51,14 @@ class ProductUpdateView(UpdateView):
             "shopapp:product_details",
             kwargs={"pk": self.object.pk},
         )
+
+    def get_form(self, form_class='ProductUpdateView'):
+        form = super().get_form(self.get_form_class())
+        owner = self.object.created_by == self.request.user
+        superuser = self.request.user.is_superuser
+        if superuser or owner:
+            return form
+        raise PermissionDenied()
 
 
 class ProductDeleteView(DeleteView):
