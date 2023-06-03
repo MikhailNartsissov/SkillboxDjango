@@ -61,7 +61,8 @@ class ProductUpdateView(PermissionRequiredMixin, UpdateView):
         raise PermissionDenied()
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(PermissionRequiredMixin, DeleteView):
+    permission_required = "shopapp.delete_product"
     model = Product
     success_url = reverse_lazy("shopapp:products_list")
 
@@ -70,6 +71,14 @@ class ProductDeleteView(DeleteView):
         self.object.archived = True
         self.object.save()
         return HttpResponseRedirect(success_url)
+
+    def get_form(self, form_class='ProductDeleteView'):
+        form = super().get_form(self.get_form_class())
+        owner = self.object.created_by == self.request.user
+        superuser = self.request.user.is_superuser
+        if superuser or owner:
+            return form
+        raise PermissionDenied()
 
 
 class OrdersListView(ListView):

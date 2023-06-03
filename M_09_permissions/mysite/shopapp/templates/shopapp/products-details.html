@@ -12,12 +12,17 @@
     <div>Discount: {{ product.discount }}</div>
     <div>Archived: {{ product.archived }}</div>
   </div>
-  <div>
-    <a href="{% url 'shopapp:product_update' pk=product.pk %}">Update product</a>
-  </div>
-  <div>
-    <a href="{% url 'shopapp:product_delete' pk=product.pk %}">Archive product</a>
-  </div>
+  <br>
+    {% if request.user.is_superuser or perms.shopapp.change_product and request.user == product.created_by %}
+        <div>
+          <a href="{% url 'shopapp:product_update' pk=product.pk %}">Update product</a>
+        </div>
+    {% endif %}
+    {% if request.user.is_superuser or perms.shopapp.delete_product and request.user == product.created_by %}
+        <div>
+          <a href="{% url 'shopapp:product_delete' pk=product.pk %}">Archive product</a>
+        </div>
+    {% endif %}
   <div>
     <a href="{% url 'shopapp:products_list' %}">Back to products list</a>
   </div>

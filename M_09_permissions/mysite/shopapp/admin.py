@@ -30,14 +30,13 @@ class ProductAdmin(admin.ModelAdmin, ExportAsCSVMixin):
     inlines = [
         OrderInline,
     ]
-    # list_display = "pk", "name", "description", "price", "discount"
-    list_display = "pk", "name", "description_short", "price", "discount", "archived"
+    list_display = "pk", "name", "description_short", "price", "discount", "archived", "created_by"
     list_display_links = "pk", "name"
     ordering = "-name", "pk"
-    search_fields = "name", "description"
+    search_fields = "name", "description", "created_by"
     fieldsets = [
         (None, {
-           "fields": ("name", "description"),
+           "fields": ("name", "description", "created_by"),
         }),
         ("Price options", {
             "fields": ("price", "discount"),
