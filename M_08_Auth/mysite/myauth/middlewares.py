@@ -17,7 +17,9 @@ class SuspiciousRequestsMiddleware:
 
         if key:
             if self.session[key][1] > 5 and req_time - self.session[key][0] <= 60:
-                return render(request, "myauth/request-denial.html")
+                return HttpResponse("<h1>Извините, от вас поступает слишком много запросов</h1>"
+                                    "<h2>К сожалению нам пришлось вас временно заблокировать.</h2>"
+                                    "<h2>Подождите одну минуту и повторите запрос.</h2>")
             elif req_time - self.session[key][0] > 60:
                 self.session[key][1] = 1
             else:
