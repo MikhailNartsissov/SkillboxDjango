@@ -1,0 +1,15 @@
+{% extends 'myauth/base.html' %}
+
+{% block title %}
+  User information update
+{% endblock %}
+
+
+{% block body %}
+  <h1>User information update</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save data">
+  </form>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'myauth/base.html' %}
+
+{% block title %}
+  Confirm set user {{ object.email }} inactive
+{% endblock %}
+
+{% block body %}
+  <h1>Are you sure you want to set {{ object.email }} inactive?</h1>
+  <br>
+  <div>
+    <a href="{% url 'myauth:about-me' %}"
+    >Back to user details</a>
+  </div>
+  <br>
+  <div>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Set inactive</button>
+    </form>
+  </div>
+{% endblock %}

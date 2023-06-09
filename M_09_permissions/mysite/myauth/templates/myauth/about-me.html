@@ -9,11 +9,30 @@
   <h1>User info</h1>
   {% if user.is_authenticated %}
     <h2>Detail</h2>
-    <p>Username: {{ user.username }}</p>
     <p>First name: {{ user.first_name }}</p>
     <p>Last name: {{ user.last_name }}</p>
     <p>Email: {{ user.email }}</p>
-    <p>Bio: {{ user.profile.bio }}</p>
+    <p>Agreement accepted: {{ user.agreement_accepted }}</p>
+    <p>Joined at: {{ user.date_joined }}</p>
+    <p>Active: {{ user.is_active }}</p>
+    <p>Bio: {{ user.biography }}</p>
+    <p>
+      <a href="{% url 'myauth:user-update' pk=user.pk %}">
+        Update user info
+      </a>
+    </p>
+    <p>
+      <a href="{% url 'myauth:password-change' pk=user.pk %}">
+        Change password
+      </a>
+    </p>
+    <p>
+      <a href="{% url 'myauth:user-inactive' pk=user.pk %}">
+        Set user inactive
+      </a>
+    </p>
+
+
   {% else %}
     <h2>User is anonymous</h2>
   {% endif %}
