@@ -7,6 +7,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
+
 from .models import Product, Order
 
 
@@ -83,16 +84,16 @@ class OrderDetailView(PermissionRequiredMixin, DetailView):
     )
 
 
-class OrderssDataExportView(View):
+class OrdersDataExportView(View):
     def get(self, request: HttpRequest) -> JsonResponse:
         orders = Order.objects.order_by("pk").all()
         orders_data = [
             {
                 "pk": order.pk,
                 "delivery_address": order.delivery_address,
-                "price": order.promocode,
-                "user": order.user,
-                "products": order.products,
+                "promocode": order.promocode,
+                "user": order.user.pk,
+                "products": [item['pk'] for item in order.products.values("pk")],
             }
             for order in orders
         ]

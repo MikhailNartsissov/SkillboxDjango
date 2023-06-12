@@ -56,20 +56,22 @@ class OrderDetailViewTestCase(TestCase):
 
 class OrdersExportTestCase(TestCase):
     fixtures = [
+        'users-fixture.json',
         'products-fixture.json',
         'orders-fixture.json',
-        'users-fixture.json',
     ]
 
-    @classmethod
-    def setUpClass(cls):
-        cls.user = User.objects.create_user(username="bob", password="qwerty")
+    def setUp(self) -> None:
+        credentials = dict(
+            username="bob",
+            password="qwerty"
+        )
+        self.user = User.objects.create_user(**credentials)
         permission = Permission.objects.get(codename="view_order")
-        cls.user.user_permissions.add(permission)
+        self.user.user_permissions.add(permission)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.user.delete()
+    def tearDown(self) -> None:
+        self.user.delete()
 
     def test_get_orders_view(self):
         response = self.client.get(
@@ -81,9 +83,9 @@ class OrdersExportTestCase(TestCase):
             {
                 "pk": order.pk,
                 "delivery_address": order.delivery_address,
-                "price": order.promocode,
-                "user": order.user,
-                "products": order.products,
+                "promocode": order.promocode,
+                "user": order.user.pk,
+                "products": [item['pk'] for item in order.products.values("pk")],
             }
             for order in orders
         ]
