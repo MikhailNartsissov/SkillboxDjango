@@ -1,78 +1,17 @@
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LogoutView
-from django.contrib.auth.models import User
-from django.contrib.auth.mixins import PermissionRequiredMixin
-
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
-
-from django.views.generic import CreateView, FormView, View, ListView, DetailView
+from django.views import View
+from django.views.generic import TemplateView, CreateView
 
 from .models import Profile
-from . forms import AvatarForm
 
 
-class AboutMeView(PermissionRequiredMixin, FormView):
-    permission_required = ["myauth.view_profile"]
+class AboutMeView(TemplateView):
     template_name = "myauth/about-me.html"
-    form_class = AvatarForm
-    success_url = "."
-
-    def get_context_data(self, **kwargs):
-        context = super(AboutMeView, self).get_context_data(**kwargs)
-        form = AvatarForm(self.request.POST or None)
-        context['avatar_form'] = form
-        return context
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        image = form.files.get("avatar")
-        user = self.request.user
-        if Profile.objects.filter(user=user):
-            user.profile.avatar = image
-            user.profile.save()
-        else:
-            Profile.objects.create(
-                user=user,
-                avatar=image,
-            )
-        return response
-
-
-class UsersListView(ListView):
-    template_name = 'myauth/users_list.html'
-    queryset = User.objects.all()
-    context_object_name = "users"
-
-
-class UserDetailsView(PermissionRequiredMixin, DetailView):
-    permission_required = ["myauth.view_profile"]
-    template_name = 'myauth/user-details.html'
-    model = User
-    context_object_name = 'user'
-    form_class = AvatarForm
-    success_url = "."
-
-    def get_context_data(self, **kwargs):
-        context = super(UserDetailsView, self).get_context_data(**kwargs)
-        context['avatar_form'] = AvatarForm()
-        return context
-
-    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        user = self.get_object()
-        image = request.FILES["avatar"]
-        if Profile.objects.filter(user=user):
-            user.profile.avatar = image
-            user.profile.save()
-        else:
-            Profile.objects.create(
-                user=user,
-                avatar=image,
-            )
-        return redirect(request.path)
 
 
 class RegisterView(CreateView):
