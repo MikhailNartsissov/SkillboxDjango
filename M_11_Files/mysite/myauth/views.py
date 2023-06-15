@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from django.views.generic import CreateView, FormView, View, ListView, DetailView
 
 from .models import Profile
-from . forms import AvatarForm
+from .forms import AvatarForm
 
 
 class AboutMeView(PermissionRequiredMixin, FormView):
