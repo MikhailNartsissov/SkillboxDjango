@@ -8,12 +8,12 @@
 {% block body %}
   <h1>User info</h1>
   {% if user.is_authenticated %}
-      <h2>Detail</h2>
-      <p>Username: {{ user.username }}</p>
-      <p>First name: {{ user.first_name }}</p>
-      <p>Last name: {{ user.last_name }}</p>
-      <p>Email: {{ user.email }}</p>
-      <p>Bio: {{ user.profile.bio }}</p>
+        <h2>{{ user.username }} details:</h2>
+        <p>Username: {{ user.username }}</p>
+        <p>First name: {% firstof  user.first_name "not specified" %}</p>
+        <p>Last name: {% firstof user.last_name "not specified" %}</p>
+        <p>Email: {% firstof user.email "not specified" %}</p>
+        <p>Bio: {% firstof user.profile.bio "not specified" %}</p>
       <div>
       {% if user.profile.avatar %}
         <img src="{{user.profile.avatar.url}}" alt="{{user.profile.avatar.name}}">
@@ -22,7 +22,7 @@
       {% endif  %}
     </div>
   <br>
-  {% if request.user.is_staff or perms.myauth.change_profile and request.user == user %}
+  {% if request.user.is_staff or request.user == user %}
     <div>
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

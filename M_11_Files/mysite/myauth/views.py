@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.models import User
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
@@ -15,8 +15,8 @@ from .models import Profile
 from .forms import AvatarForm
 
 
-class AboutMeView(PermissionRequiredMixin, FormView):
-    permission_required = ["myauth.view_profile"]
+class AboutMeView(FormView):
+
     template_name = "myauth/about-me.html"
     form_class = AvatarForm
     success_url = "."
@@ -48,13 +48,15 @@ class UsersListView(ListView):
     context_object_name = "users"
 
 
-class UserDetailsView(PermissionRequiredMixin, DetailView):
-    permission_required = ["myauth.view_profile"]
+class UserDetailsView(UserPassesTestMixin, DetailView):
     template_name = 'myauth/user-details.html'
     model = User
     context_object_name = 'user'
     form_class = AvatarForm
     success_url = "."
+
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.pk == self.get_object().pk
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailsView, self).get_context_data(**kwargs)
