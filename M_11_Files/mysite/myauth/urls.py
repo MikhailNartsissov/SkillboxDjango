@@ -13,6 +13,7 @@ from .views import (
     FooBarView,
     UsersListView,
     UserDetailsView,
+    UserProfileUpdateView,
 )
 
 app_name = "myauth"
@@ -27,13 +28,13 @@ urlpatterns = [
         ),
         name="login",
     ),
-    # path("logout/", logout_view, name="logout"),
+
     path("logout/", MyLogoutView.as_view(), name="logout"),
     path("about-me/", AboutMeView.as_view(), name="about-me"),
     path("register/", RegisterView.as_view(), name="register"),
-    path("users-list/", UsersListView.as_view(), name="users-list"),
-    path("users-list/<int:pk>/", UserDetailsView.as_view(), name="user-details"),
-
+    path("users/", UsersListView.as_view(), name="users-list"),
+    path("users/<int:pk>/", UserDetailsView.as_view(), name="user-details"),
+    path("users/<int:pk>/update/", UserProfileUpdateView.as_view(), name="user-update"),
     path("cookie/get/", get_cookie_view, name="cookie-get"),
     path("cookie/set/", set_cookie_view, name="cookie-set"),
 
