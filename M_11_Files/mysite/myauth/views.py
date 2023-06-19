@@ -7,9 +7,9 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse
 
-from django.views.generic import CreateView, FormView, View, ListView, DetailView
+from django.views.generic import CreateView, FormView, View, ListView, DetailView, UpdateView
 
 from .models import Profile
 from .forms import AvatarForm
@@ -48,15 +48,12 @@ class UsersListView(ListView):
     context_object_name = "users"
 
 
-class UserDetailsView(UserPassesTestMixin, DetailView):
+class UserDetailsView(DetailView):
     template_name = 'myauth/user-details.html'
     model = User
     context_object_name = 'user'
     form_class = AvatarForm
     success_url = "."
-
-    def test_func(self):
-        return self.request.user.is_staff or self.request.user.pk == self.get_object().pk
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailsView, self).get_context_data(**kwargs)
@@ -75,6 +72,21 @@ class UserDetailsView(UserPassesTestMixin, DetailView):
                 avatar=image,
             )
         return redirect(request.path)
+
+
+class UserProfileUpdateView(UserPassesTestMixin, UpdateView):
+    model = Profile
+    fields = "avatar", "bio"
+    template_name = "myauth/user_update.html"
+
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.pk == self.get_object().pk
+
+    def get_success_url(self):
+        return reverse(
+            "myauth:user-details",
+            kwargs={"pk": self.object.pk},
+        )
 
 
 class RegisterView(CreateView):

@@ -23,13 +23,8 @@
       {% endif  %}
     </div>
   <br>
-  {% if request.user.is_staff or request.user == user %}
-    <div>
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ avatar_form.as_p }}
-        <button type="submit">Сохранить</button>
-      </form>
-    </div>
-  {% endif %}
+  <div>
+    <a href="{% url 'myauth:user-update' pk=user.pk %}">Update user details</a>
+  </div>
+
 {% endblock %}
