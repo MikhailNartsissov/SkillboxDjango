@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, get_user_model
 from django.urls import reverse_lazy
-from django.shortcuts import redirect, reverse
+from django.shortcuts import reverse
 
 from django.views.generic import CreateView, FormView, View, ListView, DetailView, UpdateView
 
