@@ -1,0 +1,14 @@
+{% extends 'blogapp/base.html' %}
+
+{% block title %}
+  Content of {{ article_text.title }}
+{% endblock %}
+
+{% block body %}
+  <h1> {{ article_text.title }} contents </h1>
+  <div>
+    {{ article_text.content }}
+  </div>
+  <br>
+  <a href="{% url 'blogapp:index' %}">Back to articles list</a>
+{% endblock %}
