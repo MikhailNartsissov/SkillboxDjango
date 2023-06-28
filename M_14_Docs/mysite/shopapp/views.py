@@ -6,16 +6,20 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+
 
 from .forms import ProductForm
 from .models import Product, Order, ProductImage
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, OrderSerializer
 
 
 class ProductViewSet(ModelViewSet):
+    permission_classes = []
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [
@@ -35,6 +39,38 @@ class ProductViewSet(ModelViewSet):
         "name",
         "price",
         "discount",
+    ]
+
+
+class OrderViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+    queryset = (
+        Order.objects
+        .select_related("user")
+        .prefetch_related("products")
+    )
+    filter_backends = [
+        SearchFilter,
+        DjangoFilterBackend,
+        OrderingFilter,
+    ]
+    search_fields = [
+        "user",
+        "delivery_address",
+        "promocode",
+        "products",
+    ]
+    filterset_fields = [
+        "user",
+        "delivery_address",
+        "promocode",
+        "products",
+    ]
+    ordering_fields = [
+        "user",
+        "delivery_address",
+        "promocode",
     ]
 
 
