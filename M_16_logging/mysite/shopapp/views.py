@@ -14,6 +14,11 @@ from .forms import ProductForm
 from .models import Product, Order, ProductImage
 from .serializers import ProductSerializer
 
+from logging import getLogger
+
+
+logger = getLogger(__name__)
+
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
