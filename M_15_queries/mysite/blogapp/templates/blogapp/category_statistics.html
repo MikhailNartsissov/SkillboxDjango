@@ -1,0 +1,26 @@
+{% extends 'blogapp/base.html' %}
+
+{% block title %}
+  Articles list
+{% endblock %}
+
+{% block body %}
+  <h1>Categories:</h1>
+  {% if object_list %}
+
+    <div>
+    {% for category in object_list %}
+      <div>
+        <p><strong>Category name: {{ category.name }}"</strong></p>
+        <p>Total articles in the category: {{ category.articles_count }}</p>
+        <p>Authors in the category: {{ category.authors_count }}</p>
+        <p>Top author in the category: {% firstof category.top_author "no top author yet" %}</p>
+        <br>
+      </div>
+    {% endfor %}
+    </div>
+
+  {% else %}
+    <h3>There is no articles yet</h3>
+  {% endif %}
+{% endblock body %}
