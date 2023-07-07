@@ -1,5 +1,7 @@
 from timeit import default_timer
 
+from django.contrib.syndication.views import Feed
+
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
@@ -36,6 +38,22 @@ class ProductViewSet(ModelViewSet):
         "price",
         "discount",
     ]
+
+
+class LatestProductsFeed(Feed):
+    title = "New products arrivals"
+    description = "Actual information about new products in stock"
+    link = reverse_lazy("shopapp:products_list")
+
+    def items(self):
+        return Product.objects.filter(archived=False).order_by("-created_at")[:5]
+
+    def item_title(self, item: Product):
+        return item.name
+
+    def item_description(self, item: Product):
+        return item.description[:50]
+
 
 
 class ShopIndexView(View):
