@@ -30,6 +30,7 @@ class Product(models.Model):
     if TYPE_CHECKING:
         objects: Manager
 
+
 def product_images_directory_path(instance: "ProductImage", filename: str) -> str:
     return "products/product_{pk}/images/{filename}".format(
         pk=instance.product.pk,

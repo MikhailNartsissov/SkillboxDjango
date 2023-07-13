@@ -1,7 +1,11 @@
 from csv import DictWriter
 from timeit import default_timer
 
+from django.core.cache import cache
+from django.core.serializers import serialize
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
+from django.contrib.auth.models import User
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
 from django.views import View
@@ -18,7 +22,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .common import save_csv_products
 from .forms import ProductForm
 from .models import Product, Order, ProductImage
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, UserOrderSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -115,7 +119,6 @@ class ProductCreateView(CreateView):
 
 class ProductUpdateView(UpdateView):
     model = Product
-    # fields = "name", "price", "description", "discount", "preview"
     template_name_suffix = "_update_form"
     form_class = ProductForm
 
@@ -145,6 +148,34 @@ class ProductDeleteView(DeleteView):
         self.object.archived = True
         self.object.save()
         return HttpResponseRedirect(success_url)
+
+
+class UsersListView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = "shopapp/users_list.html"
+
+
+class UserOrdersListView(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = "shopapp/user_orders.html"
+
+    def get_context_data(self, **kwargs):
+        orders = Order.objects.filter(user=self.object.pk).prefetch_related("products")
+        context = {"orders": orders}
+        context.update(kwargs)
+        return super().get_context_data(**context)
+
+
+class UserOrdersExportView(LoginRequiredMixin, View):
+    def get(self, request: HttpRequest, pk: int) -> JsonResponse:
+        user = get_object_or_404(User, pk=pk)
+        orders = Order.objects.filter(user=user).order_by('pk')
+        cache_key = "user_order_export" + user.username
+        user_orders_data = cache.get(cache_key)
+        if user_orders_data is None:
+            user_orders_data = UserOrderSerializer(orders, many=True)
+            cache.set(cache_key, user_orders_data, 300)
+        return JsonResponse(user_orders_data.data, safe=False)
 
 
 class OrdersListView(LoginRequiredMixin, ListView):

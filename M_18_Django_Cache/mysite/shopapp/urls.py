@@ -12,6 +12,9 @@ from .views import (
     ProductDeleteView,
     ProductsDataExportView,
     ProductViewSet,
+    UsersListView,
+    UserOrdersListView,
+    UserOrdersExportView,
 )
 
 app_name = "shopapp"
@@ -22,6 +25,9 @@ routers.register("products", ProductViewSet)
 urlpatterns = [
     path("", ShopIndexView.as_view(), name="index"),
     path("api/", include(routers.urls)),
+    path("users/", UsersListView.as_view(), name="users_list"),
+    path("users/<int:pk>/orders/", UserOrdersListView.as_view(), name="user_orders"),
+    path("users/<int:pk>/orders/export/", UserOrdersExportView.as_view(), name="user_orders_export"),
     path("products/", ProductsListView.as_view(), name="products_list"),
     path("products/export/", ProductsDataExportView.as_view(), name="products-export"),
     path("products/create/", ProductCreateView.as_view(), name="product_create"),

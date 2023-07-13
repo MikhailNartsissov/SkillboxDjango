@@ -1,0 +1,44 @@
+{% extends 'shopapp/base.html' %}
+{% load cache %}
+
+{% block title %}
+  User #{{ object.pk }} information and orders
+{% endblock %}
+
+{% block body %}
+  <h1>User #{{ object.pk }}</h1>
+  <div>
+    <p><strong>Username:</strong> {{ object.username }}</p>
+    <p><strong>First name:</strong> {{ object.firstname }}</p>
+    <p><strong>Last name:</strong> {{ object.lastname }}</p>
+    <p><strong>Email address:</strong> {{ object.email }}</p>
+  </div>
+  <br>
+  {% if orders %}
+  {% cache 180 user_orders object.username %}
+  <h2>Orders made by {% firstof object.first_name object.username %}</h2>
+    {% for order in orders %}
+      <div>
+        <p><strong>Order id:</strong> {{ order.pk }}</p>
+        <p><strong>Created at:</strong> {{ order.created_at }}</p>
+        <p><strong>Delivery address: {{ order.delivery_address }}</strong></p>
+        <p><strong>Promocode:</strong> <code>{{ order.promocode }}</code></p>
+        <p><strong>Products in order:</strong></p>
+          {% for product in order.products.all %}
+            <p>Product: {{product.name}}</p>
+            <p>Price: ${{ product.price }}</p>
+          {% endfor %}
+      </div>
+      <br>
+    {% endfor %}
+  {% endcache %}
+  {% else %}
+        <h2>User {% firstof object.first_name object.username %} have no orders yet</h2>
+  {% endif %}
+  <div>
+    <a href="{% url 'shopapp:users_list' %}">Back to users</a>
+  </div>
+  <div>
+    <a href="{% url 'shopapp:user_orders_export' pk=object.pk %}">Export to JSON</a>
+  </div>
+{% endblock %}
