@@ -2,7 +2,6 @@ from csv import DictWriter
 from timeit import default_timer
 
 from django.core.cache import cache
-from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User
@@ -170,7 +169,7 @@ class UserOrdersExportView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> JsonResponse:
         user = get_object_or_404(User, pk=pk)
         orders = Order.objects.filter(user=user).order_by('pk')
-        cache_key = "user_order_export" + user.username
+        cache_key = "user_order_export" + str(user.pk)
         user_orders_data = cache.get(cache_key)
         if user_orders_data is None:
             user_orders_data = UserOrderSerializer(orders, many=True)
